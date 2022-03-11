@@ -622,6 +622,7 @@ class GraphDefinition(NodeDefinition):
         resources: Optional[Dict[str, Any]] = None,
         raise_on_error: bool = True,
         op_selection: Optional[List[str]] = None,
+        input_values: Optional[Dict[str, Any]] = None,
     ) -> "ExecuteInProcessResult":
         """
         Execute this graph in-process, collecting results in-memory.
@@ -664,7 +665,7 @@ class GraphDefinition(NodeDefinition):
             executor_defs=[execute_in_process_executor], resource_defs=resource_defs
         )
         ephemeral_job = JobDefinition(
-            name=self._name, graph_def=self, mode_def=in_proc_mode
+            name=self._name, graph_def=self, mode_def=in_proc_mode, _input_values=input_values
         ).get_job_def_for_op_selection(op_selection)
 
         run_config = run_config if run_config is not None else {}

@@ -66,12 +66,14 @@ class JobDefinition(PipelineDefinition):
         op_retry_policy: Optional[RetryPolicy] = None,
         version_strategy: Optional[VersionStrategy] = None,
         _op_selection_data: Optional[OpSelectionData] = None,
+        _input_values: Optional[Dict[str, Any]] = None,
     ):
 
         self._cached_partition_set: Optional["PartitionSetDefinition"] = None
         self._op_selection_data = check.opt_inst_param(
             _op_selection_data, "_op_selection_data", OpSelectionData
         )
+        self._input_values = check.opt_dict_param(_input_values, "_input_values")
 
         super(JobDefinition, self).__init__(
             name=name,
