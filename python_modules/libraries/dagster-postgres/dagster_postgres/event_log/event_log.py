@@ -19,7 +19,7 @@ from dagster.core.storage.sql import create_engine, run_alembic_upgrade, stamp_a
 from dagster.serdes import (
     ConfigurableClass,
     ConfigurableClassData,
-    deserialize_json_to_dagster_namedtuple,
+    deserialize_as,
     serialize_dagster_namedtuple,
 )
 from dagster.utils import utc_datetime_from_timestamp
@@ -304,7 +304,7 @@ def watcher_thread(
                 handlers = handlers_dict.get(run_id, [])
 
             engine = create_engine(
-                conn_string, isolation_level="AUTOCOMMIT", poolclass=db.pool.NullPool
+                conn_string, isolation_level="AUTOCOMMIT", poolclass=db.pool.NullPool  # type: ignore
             )
             try:
                 with engine.connect() as conn:
@@ -313,8 +313,8 @@ def watcher_thread(
                             SqlEventLogStorageTable.c.id == index
                         ),
                     )
-                    dagster_event: EventLogEntry = deserialize_json_to_dagster_namedtuple(
-                        cursor_res.scalar()
+                    dagster_event = deserialize_as(
+                        cursor_res.scalar(), EventLogEntry  # type: ignore
                     )
             finally:
                 engine.dispose()
