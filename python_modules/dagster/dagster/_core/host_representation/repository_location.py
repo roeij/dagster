@@ -118,7 +118,7 @@ class RepositoryLocation(AbstractContextManager):
     def get_external_execution_plan(
         self,
         external_pipeline: ExternalPipeline,
-        run_config: Dict[str, Any],
+        run_config: Mapping[str, object],
         mode: str,
         step_keys_to_execute: Optional[List[str]],
         known_state: Optional[KnownExecutionState],
@@ -343,7 +343,7 @@ class InProcessRepositoryLocation(RepositoryLocation):
     def get_external_execution_plan(
         self,
         external_pipeline: ExternalPipeline,
-        run_config: Dict[str, Any],
+        run_config: Mapping[str, object],
         mode: str,
         step_keys_to_execute: Optional[List[str]],
         known_state: Optional[KnownExecutionState],
