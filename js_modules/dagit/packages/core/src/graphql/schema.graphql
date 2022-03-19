@@ -995,7 +995,7 @@ type AssetLineageInfo {
 
 type AssetDependency {
   asset: AssetNode!
-  inputName: String!
+  inputName: String
 }
 
 type MaterializationCountByPartition {
