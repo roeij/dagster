@@ -162,7 +162,7 @@ class EcsRunLauncher(RunLauncher, ConfigurableClass):
         """
         run = context.pipeline_run
         family = sanitize_family(
-            run.external_pipeline_origin.external_repository_origin.repository_location_origin.location_name
+            run.external_pipeline_origin.external_repository_origin.repository_location_origin.location_name  # type: ignore
         )
         metadata = self._task_metadata()
         pipeline_origin = check.not_none(context.pipeline_code_origin)

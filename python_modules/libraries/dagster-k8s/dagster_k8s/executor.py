@@ -14,7 +14,6 @@ from dagster.core.executor.init import InitExecutorContext
 from dagster.core.executor.step_delegating import StepDelegatingExecutor
 from dagster.core.executor.step_delegating.step_handler import StepHandler
 from dagster.core.executor.step_delegating.step_handler.base import StepHandlerContext
-from dagster.core.types.dagster_type import Optional
 from dagster.utils import frozentags, merge_dicts
 
 from .job import (
@@ -94,7 +93,7 @@ def k8s_job_executor(init_context: InitExecutorContext) -> Executor:
         + check.opt_list_elem(exc_cfg, "env_config_maps", of_type=str),
         env_secrets=run_launcher.env_secrets
         + cast(List[str], check.opt_list_elem(exc_cfg, "env_secrets", of_type=str)),
-        env_vars = run_launcher.env_vars + check.opt_list_elem(exc_cfg, "env_vars", of_type=str),
+        env_vars=run_launcher.env_vars + check.opt_list_elem(exc_cfg, "env_vars", of_type=str),
         volume_mounts=run_launcher.volume_mounts + check.opt_list_elem(exc_cfg, "volume_mounts"),
         volumes=run_launcher.volumes + check.opt_list_elem(exc_cfg, "volumes"),
         labels=merge_dicts(
