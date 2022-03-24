@@ -13,25 +13,25 @@ import {
   Box,
 } from '@dagster-io/ui';
 import {isEqual} from 'lodash';
-import qs from 'qs';
-import React, {CSSProperties} from 'react';
-import {Link} from 'react-router-dom';
+import React from 'react';
 import styled from 'styled-components/macro';
 
-import {displayNameForAssetKey} from '../../app/Util';
+import {displayNameForAssetKey, withMiddleTruncation} from '../../app/Util';
 import {LATEST_MATERIALIZATION_METADATA_FRAGMENT} from '../../assets/LastMaterializationMetadata';
 import {NodeHighlightColors} from '../../graph/OpNode';
 import {OpTags} from '../../graph/OpTags';
 import {METADATA_ENTRY_FRAGMENT} from '../../metadata/MetadataEntry';
-import {titleForRun} from '../../runs/RunUtils';
 import {TimeElapsed} from '../../runs/TimeElapsed';
 import {TimestampDisplay} from '../../schedules/TimestampDisplay';
 import {buildRepoAddress} from '../buildRepoAddress';
-import {workspacePath, workspacePipelinePathGuessRepo} from '../workspacePath';
 
 import {LiveDataForNode, __ASSET_GROUP} from './Utils';
 import {AssetNodeFragment} from './types/AssetNodeFragment';
 import {useLaunchSingleAssetJob} from './useLaunchSingleAssetJob';
+
+const MAX_ANONTATIONS_WIDTH = 85;
+const DISPLAY_NAME_MAX_LENGTH = 50;
+const DISPLAY_NAME_PX_PER_CHAR = 8.0;
 
 export const AssetNode: React.FC<{
   definition: AssetNodeFragment;
@@ -44,14 +44,15 @@ export const AssetNode: React.FC<{
   const launch = useLaunchSingleAssetJob();
 
   const event = liveData?.lastMaterialization;
-  const runOrError = event?.runOrError;
   const kind = metadata.find((m) => m.key === 'kind')?.value;
   const repoAddress = buildRepoAddress(
     definition.repository.name,
     definition.repository.location.name,
   );
 
-  const displayName = displayNameForAssetKey(definition.assetKey);
+  const displayName = withMiddleTruncation(displayNameForAssetKey(definition.assetKey), {
+    maxLength: DISPLAY_NAME_MAX_LENGTH,
+  });
 
   return (
     <ContextMenu
@@ -91,71 +92,37 @@ export const AssetNode: React.FC<{
               {displayName}
             </div>
             <div style={{flex: 1}} />
-            {liveData && liveData.inProgressRunIds.length > 0 ? (
-              <Tooltip content="A run is currently rematerializing this asset.">
-                <Spinner purpose="body-text" />
-              </Tooltip>
-            ) : liveData && liveData.unstartedRunIds.length > 0 ? (
-              <Tooltip content="A run has started that will rematerialize this asset soon.">
-                <Spinner purpose="body-text" stopped />
-              </Tooltip>
-            ) : liveData &&
-              (liveData.runWhichFailedToMaterialize || liveData.runsSinceMaterialization) ? (
-              <Tooltip content="This asset was not materialized by one or more recent runs.">
-                <IconWIP name="warning" color={ColorsWIP.Gray400} />
-              </Tooltip>
-            ) : undefined}
+            <div style={{display: 'flex', gap: 4, maxWidth: MAX_ANONTATIONS_WIDTH}}>
+              {liveData && liveData.inProgressRunIds.length > 0 ? (
+                <Tooltip content="A run is currently rematerializing this asset.">
+                  <Spinner purpose="body-text" />
+                </Tooltip>
+              ) : liveData && liveData.unstartedRunIds.length > 0 ? (
+                <Tooltip content="A run has started that will rematerialize this asset soon.">
+                  <Spinner purpose="body-text" stopped />
+                </Tooltip>
+              ) : liveData &&
+                (liveData.runWhichFailedToMaterialize || liveData.runsSinceMaterialization) ? (
+                <Tooltip content="This asset was not materialized by one or more recent runs.">
+                  <IconWIP name="warning" color={ColorsWIP.Gray400} />
+                </Tooltip>
+              ) : undefined}
 
-            {liveData?.computeStatus === 'old' && (
-              <UpstreamNotice>
-                upstream
-                <br />
-                changed
-              </UpstreamNotice>
-            )}
+              {liveData?.computeStatus === 'old' && (
+                <UpstreamNotice>
+                  upstream
+                  <br />
+                  changed
+                </UpstreamNotice>
+              )}
+            </div>
           </Name>
           {definition.description && !inAssetCatalog && (
             <Description>{markdownToPlaintext(definition.description).split('\n')[0]}</Description>
           )}
           <Stats>
-            {runOrError?.__typename === 'Run' && event ? (
+            {event ? (
               <>
-                <StatsRow>
-                  {runOrError.pipelineName !== __ASSET_GROUP ? (
-                    <Link
-                      data-tooltip={runOrError.pipelineName}
-                      data-tooltip-style={RunLinkTooltipStyle}
-                      style={{overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: 8}}
-                      target={inAssetCatalog ? '_blank' : undefined}
-                      onClick={(e) => e.stopPropagation()}
-                      to={
-                        repoAddress.name
-                          ? workspacePath(
-                              repoAddress.name,
-                              repoAddress.location,
-                              `jobs/${runOrError.pipelineName}`,
-                            )
-                          : workspacePipelinePathGuessRepo(runOrError.pipelineName, true, '')
-                      }
-                    >
-                      {runOrError.pipelineName}
-                    </Link>
-                  ) : (
-                    <span />
-                  )}
-                  <Link
-                    style={{fontFamily: FontFamily.monospace, fontSize: 14}}
-                    to={`/instance/runs/${runOrError.runId}?${qs.stringify({
-                      timestamp: event.stepStats.endTime,
-                      selection: event.stepStats.stepKey,
-                      logs: `step:${event.stepStats.stepKey}`,
-                    })}`}
-                    onClick={(e) => e.stopPropagation()}
-                    target="_blank"
-                  >
-                    {titleForRun({runId: runOrError.runId})}
-                  </Link>
-                </StatsRow>
                 <StatsRow>
                   {event.stepStats.endTime ? (
                     <TimestampDisplay
@@ -175,10 +142,6 @@ export const AssetNode: React.FC<{
               <>
                 <StatsRow style={{opacity: 0.5}}>
                   <span>No materializations</span>
-                  <span>—</span>
-                </StatsRow>
-                <StatsRow style={{opacity: 0.5}}>
-                  <span>—</span>
                   <span>—</span>
                 </StatsRow>
               </>
@@ -251,14 +214,6 @@ export const ASSET_NODE_LIVE_FRAGMENT = gql`
         startTime
         endTime
       }
-      runOrError {
-        ... on PipelineRun {
-          id
-          runId
-          status
-          pipelineName
-        }
-      }
     }
   }
 
@@ -295,7 +250,7 @@ export const getNodeDimensions = (def: {
   opName: string | null;
   description?: string | null;
 }) => {
-  let height = 95;
+  let height = 75;
   if (def.description) {
     height += 25;
   }
@@ -303,7 +258,14 @@ export const getNodeDimensions = (def: {
   if (def.opName && displayName !== def.opName) {
     height += 25;
   }
-  return {width: Math.max(250, displayName.length * 8.0) + 25, height};
+  return {
+    width:
+      Math.max(
+        200,
+        Math.min(DISPLAY_NAME_MAX_LENGTH, displayName.length) * DISPLAY_NAME_PX_PER_CHAR,
+      ) + MAX_ANONTATIONS_WIDTH,
+    height,
+  };
 };
 
 const BoxColors = {
@@ -311,17 +273,6 @@ const BoxColors = {
   Description: 'rgba(245, 245, 250, 1)',
   Stats: 'rgba(236, 236, 248, 1)',
 };
-
-const RunLinkTooltipStyle = JSON.stringify({
-  background: BoxColors.Stats,
-  padding: '4px 8px',
-  marginLeft: -10,
-  marginTop: -8,
-  fontSize: 13,
-  color: ColorsWIP.Link,
-  border: 0,
-  borderRadius: 4,
-} as CSSProperties);
 
 const AssetNodeContainer = styled.div<{$selected: boolean}>`
   outline: ${(p) => (p.$selected ? `2px dashed ${NodeHighlightColors.Border}` : 'none')};
@@ -347,6 +298,7 @@ const AssetNodeBox = styled.div`
 `;
 
 const Name = styled.div`
+  /** Keep in sync with DISPLAY_NAME_PX_PER_CHAR */
   display: flex;
   padding: 4px 6px;
   background: ${ColorsWIP.White};

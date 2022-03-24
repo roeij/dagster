@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AssetKeyInput, InstigationStatus, RunStatus } from "./../../types/globalTypes";
+import { AssetKeyInput, InstigationStatus } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AssetQuery
@@ -247,7 +247,6 @@ export interface AssetQuery_assetOrError_Asset_definition_assetMaterializations_
   pipelineName: string;
   pipelineSnapshotId: string | null;
   repositoryOrigin: AssetQuery_assetOrError_Asset_definition_assetMaterializations_runOrError_Run_repositoryOrigin | null;
-  status: RunStatus;
 }
 
 export type AssetQuery_assetOrError_Asset_definition_assetMaterializations_runOrError = AssetQuery_assetOrError_Asset_definition_assetMaterializations_runOrError_RunNotFoundError | AssetQuery_assetOrError_Asset_definition_assetMaterializations_runOrError_Run;
@@ -2780,7 +2779,6 @@ export interface AssetQuery_assetOrError_Asset_definition_dependencies_asset_ass
   pipelineName: string;
   pipelineSnapshotId: string | null;
   repositoryOrigin: AssetQuery_assetOrError_Asset_definition_dependencies_asset_assetMaterializations_runOrError_Run_repositoryOrigin | null;
-  status: RunStatus;
 }
 
 export type AssetQuery_assetOrError_Asset_definition_dependencies_asset_assetMaterializations_runOrError = AssetQuery_assetOrError_Asset_definition_dependencies_asset_assetMaterializations_runOrError_RunNotFoundError | AssetQuery_assetOrError_Asset_definition_dependencies_asset_assetMaterializations_runOrError_Run;
@@ -3172,7 +3170,6 @@ export interface AssetQuery_assetOrError_Asset_definition_dependedBy_asset_asset
   pipelineName: string;
   pipelineSnapshotId: string | null;
   repositoryOrigin: AssetQuery_assetOrError_Asset_definition_dependedBy_asset_assetMaterializations_runOrError_Run_repositoryOrigin | null;
-  status: RunStatus;
 }
 
 export type AssetQuery_assetOrError_Asset_definition_dependedBy_asset_assetMaterializations_runOrError = AssetQuery_assetOrError_Asset_definition_dependedBy_asset_assetMaterializations_runOrError_RunNotFoundError | AssetQuery_assetOrError_Asset_definition_dependedBy_asset_assetMaterializations_runOrError_Run;

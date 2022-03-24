@@ -111,7 +111,6 @@ export interface AssetGraphLiveQuery_assetNodes_assetMaterializations_runOrError
   pipelineName: string;
   pipelineSnapshotId: string | null;
   repositoryOrigin: AssetGraphLiveQuery_assetNodes_assetMaterializations_runOrError_Run_repositoryOrigin | null;
-  status: RunStatus;
 }
 
 export type AssetGraphLiveQuery_assetNodes_assetMaterializations_runOrError = AssetGraphLiveQuery_assetNodes_assetMaterializations_runOrError_RunNotFoundError | AssetGraphLiveQuery_assetNodes_assetMaterializations_runOrError_Run;

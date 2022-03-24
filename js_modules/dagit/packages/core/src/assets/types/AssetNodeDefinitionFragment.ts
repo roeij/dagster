@@ -3,8 +3,6 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { RunStatus } from "./../../types/globalTypes";
-
 // ====================================================
 // GraphQL fragment: AssetNodeDefinitionFragment
 // ====================================================
@@ -197,7 +195,6 @@ export interface AssetNodeDefinitionFragment_assetMaterializations_runOrError_Ru
   pipelineName: string;
   pipelineSnapshotId: string | null;
   repositoryOrigin: AssetNodeDefinitionFragment_assetMaterializations_runOrError_Run_repositoryOrigin | null;
-  status: RunStatus;
 }
 
 export type AssetNodeDefinitionFragment_assetMaterializations_runOrError = AssetNodeDefinitionFragment_assetMaterializations_runOrError_RunNotFoundError | AssetNodeDefinitionFragment_assetMaterializations_runOrError_Run;
@@ -2730,7 +2727,6 @@ export interface AssetNodeDefinitionFragment_dependencies_asset_assetMaterializa
   pipelineName: string;
   pipelineSnapshotId: string | null;
   repositoryOrigin: AssetNodeDefinitionFragment_dependencies_asset_assetMaterializations_runOrError_Run_repositoryOrigin | null;
-  status: RunStatus;
 }
 
 export type AssetNodeDefinitionFragment_dependencies_asset_assetMaterializations_runOrError = AssetNodeDefinitionFragment_dependencies_asset_assetMaterializations_runOrError_RunNotFoundError | AssetNodeDefinitionFragment_dependencies_asset_assetMaterializations_runOrError_Run;
@@ -3122,7 +3118,6 @@ export interface AssetNodeDefinitionFragment_dependedBy_asset_assetMaterializati
   pipelineName: string;
   pipelineSnapshotId: string | null;
   repositoryOrigin: AssetNodeDefinitionFragment_dependedBy_asset_assetMaterializations_runOrError_Run_repositoryOrigin | null;
-  status: RunStatus;
 }
 
 export type AssetNodeDefinitionFragment_dependedBy_asset_assetMaterializations_runOrError = AssetNodeDefinitionFragment_dependedBy_asset_assetMaterializations_runOrError_RunNotFoundError | AssetNodeDefinitionFragment_dependedBy_asset_assetMaterializations_runOrError_Run;

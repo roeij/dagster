@@ -3,8 +3,6 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { RunStatus } from "./../../../types/globalTypes";
-
 // ====================================================
 // GraphQL fragment: AssetNodeLiveFragment
 // ====================================================
@@ -46,7 +44,6 @@ export interface AssetNodeLiveFragment_assetMaterializations_runOrError_Run {
   pipelineName: string;
   pipelineSnapshotId: string | null;
   repositoryOrigin: AssetNodeLiveFragment_assetMaterializations_runOrError_Run_repositoryOrigin | null;
-  status: RunStatus;
 }
 
 export type AssetNodeLiveFragment_assetMaterializations_runOrError = AssetNodeLiveFragment_assetMaterializations_runOrError_RunNotFoundError | AssetNodeLiveFragment_assetMaterializations_runOrError_Run;
