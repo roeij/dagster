@@ -7,11 +7,13 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Generic,
     List,
     Mapping,
     NamedTuple,
     Optional,
     Sequence,
+    TypeVar,
     Union,
     cast,
 )
@@ -157,6 +159,9 @@ class AssetLineageInfo(
         return super(AssetLineageInfo, cls).__new__(cls, asset_key=asset_key, partitions=partitions)
 
 
+T = TypeVar("T")
+
+
 class Output(
     NamedTuple(
         "_Output",
@@ -165,7 +170,8 @@ class Output(
             ("output_name", str),
             ("metadata_entries", List[Union[PartitionMetadataEntry, MetadataEntry]]),
         ],
-    )
+    ),
+    Generic[T],
 ):
     """Event corresponding to one of a op's outputs.
 
@@ -191,7 +197,7 @@ class Output(
 
     def __new__(
         cls,
-        value: Any,
+        value: T,
         output_name: Optional[str] = DEFAULT_OUTPUT,
         metadata_entries: Optional[List[Union[MetadataEntry, PartitionMetadataEntry]]] = None,
         metadata: Optional[Dict[str, RawMetadataValue]] = None,
