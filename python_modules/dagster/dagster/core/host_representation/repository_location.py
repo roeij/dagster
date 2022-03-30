@@ -303,6 +303,10 @@ class InProcessRepositoryLocation(RepositoryLocation):
         return self._recon_repo.container_image
 
     @property
+    def container_context(self) -> Optional[Dict[str, Any]]:
+        return self._recon_repo.container_context
+
+    @property
     def entry_point(self) -> Optional[List[str]]:
         return self._recon_repo.entry_point
 
@@ -515,6 +519,7 @@ class GrpcServerRepositoryLocation(RepositoryLocation):
 
         self._executable_path = None
         self._container_image = None
+        self._container_context = None
         self._repository_code_pointer_dict = None
         self._entry_point = None
 
@@ -552,7 +557,12 @@ class GrpcServerRepositoryLocation(RepositoryLocation):
             )
             self._entry_point = list_repositories_response.entry_point
 
-            self._container_image = self._reload_current_image()
+            self._container_image = (
+                list_repositories_response.container_image
+                or self._reload_current_image()  # Back-compat for older gRPC servers that did not include container_image in ListRepositoriesResponse
+            )
+
+            self._container_context = list_repositories_response.container_context
 
             self._external_repositories_data = sync_get_streaming_external_repositories_data_grpc(
                 self.client,
@@ -580,6 +590,10 @@ class GrpcServerRepositoryLocation(RepositoryLocation):
     @property
     def container_image(self) -> str:
         return cast(str, self._container_image)
+
+    @property
+    def container_context(self) -> Optional[Dict[str, Any]]:
+        return self._container_context
 
     @property
     def repository_code_pointer_dict(self) -> Dict[str, CodePointer]:

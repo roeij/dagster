@@ -51,6 +51,8 @@ spec:
                 secretKeyRef:
                   name: {{ include "dagsterUserDeployments.postgresql.secretName" $ }}
                   key: postgresql-password
+            - name: DAGSTER_CLI_API_GRPC_CONTAINER_CONTEXT
+              value: {{ include "dagsterUserDeployments.k8sContainerContext" $deployment | fromYaml | toJson | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "dagster.fullname" $ }}-{{ $deployment.name }}-user-env

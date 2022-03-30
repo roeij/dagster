@@ -511,9 +511,12 @@ def test_user_deployment_image(template: HelmTemplate):
     assert image_name == deployment.image.repository
     assert image_tag == deployment.image.tag
 
+    container_context = user_deployments[0].spec.template.spec.containers[0].env[2]
+    assert container_context.name == "DAGSTER_CLI_API_GRPC_CONTAINER_CONTEXT"
+    assert json.loads(container_context.value) == {"k8s": {"image_pull_policy": "Always"}}
+
 
 def test_user_deployment_volumes(template: HelmTemplate):
-
     name = "foo"
 
     volumes = [
@@ -574,6 +577,88 @@ def test_user_deployment_volumes(template: HelmTemplate):
 
     assert image_name == deployment.image.repository
     assert image_tag == deployment.image.tag
+
+    container_context = user_deployments[0].spec.template.spec.containers[0].env[2]
+    assert container_context.name == "DAGSTER_CLI_API_GRPC_CONTAINER_CONTEXT"
+    assert json.loads(container_context.value) == {
+        "k8s": {"image_pull_policy": "Always", "volume_mounts": volume_mounts, "volumes": volumes}
+    }
+
+
+def test_user_deployment_secrets_and_configmaps(template: HelmTemplate):
+    name = "foo"
+
+    secrets = [{"name": "my-secret"}, {"name": "my-other-secret"}]
+
+    configmaps = [{"name": "my-configmap"}, {"name": "my-other-configmap"}]
+
+    deployment = UserDeployment(
+        name=name,
+        image=kubernetes.Image(repository=f"repo/{name}", tag="tag1", pullPolicy="Always"),
+        dagsterApiGrpcArgs=["-m", name],
+        port=3030,
+        envConfigMaps=[
+            kubernetes.ConfigMapEnvSource.construct(None, **configmap) for configmap in configmaps
+        ],
+        envSecrets=[kubernetes.SecretEnvSource.construct(None, **secret) for secret in secrets],
+    )
+
+    helm_values = DagsterHelmValues.construct(
+        dagsterUserDeployments=UserDeployments(
+            enabled=True,
+            enableSubchart=True,
+            deployments=[deployment],
+        )
+    )
+
+    user_deployments = template.render(helm_values)
+
+    assert len(user_deployments) == 1
+
+    container_context = user_deployments[0].spec.template.spec.containers[0].env[2]
+    assert container_context.name == "DAGSTER_CLI_API_GRPC_CONTAINER_CONTEXT"
+    assert json.loads(container_context.value) == {
+        "k8s": {
+            "image_pull_policy": "Always",
+            "env_secrets": ["my-secret", "my-other-secret"],
+            "env_config_maps": ["my-configmap", "my-other-configmap"],
+        }
+    }
+
+
+def test_user_deployment_labels(template: HelmTemplate):
+    name = "foo"
+
+    labels = {"my-label-key": "my-label-val", "my-other-label-key": "my-other-label-val"}
+
+    deployment = UserDeployment(
+        name=name,
+        image=kubernetes.Image(repository=f"repo/{name}", tag="tag1", pullPolicy="Always"),
+        dagsterApiGrpcArgs=["-m", name],
+        port=3030,
+        labels=labels,
+    )
+
+    helm_values = DagsterHelmValues.construct(
+        dagsterUserDeployments=UserDeployments(
+            enabled=True,
+            enableSubchart=True,
+            deployments=[deployment],
+        )
+    )
+
+    user_deployments = template.render(helm_values)
+
+    assert len(user_deployments) == 1
+
+    container_context = user_deployments[0].spec.template.spec.containers[0].env[2]
+    assert container_context.name == "DAGSTER_CLI_API_GRPC_CONTAINER_CONTEXT"
+    assert json.loads(container_context.value) == {
+        "k8s": {
+            "image_pull_policy": "Always",
+            "labels": labels,
+        }
+    }
 
 
 def test_subchart_image_pull_secrets(subchart_template: HelmTemplate):
