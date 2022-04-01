@@ -9,7 +9,6 @@ from typing import (
     Optional,
     Set,
     Union,
-    cast,
 )
 
 from dagster import check
@@ -1029,7 +1028,7 @@ def _create_run_config_schema(
     mode_definition: ModeDefinition,
     required_resources: Set[str],
 ) -> "RunConfigSchema":
-    from .job_definition import JobDefinition, get_input_values_from_job
+    from .job_definition import get_input_values_from_job
     from .run_config import (
         RunConfigSchemaCreationData,
         construct_config_type_dictionary,
