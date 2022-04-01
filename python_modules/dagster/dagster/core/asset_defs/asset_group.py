@@ -22,6 +22,7 @@ from typing import (
 
 from dagster import check
 from dagster.core.definitions.events import AssetKey
+from dagster.core.execution.execute_in_process_result import ExecuteInProcessResult
 from dagster.core.storage.fs_asset_io_manager import fs_asset_io_manager
 from dagster.utils import merge_dicts
 from dagster.utils.backcompat import ExperimentalWarning
@@ -474,6 +475,31 @@ class AssetGroup(
         if module is None:
             check.failed("Could not find a module for the caller")
         return AssetGroup.from_modules([module], resource_defs, executor_def)
+
+    def materialize_in_process(
+        self, selection: Optional[Union[str, List[str]]] = None
+    ) -> ExecuteInProcessResult:
+        """
+        Executes an in-process run that materializes all assets in the group.
+
+        "In-process" means that ops are invoked without creating subprocesses. The assets can still
+        be stored out-of-process, depending on what IOManager is used.
+
+        Args:
+            selection (Union[str, List[str]]): A single selection query or list of selection queries
+                to for assets in the group. For example:
+
+                    - ``['some_asset_key']`` select ``some_asset_key`` itself.
+                    - ``['*some_asset_key']`` select ``some_asset_key`` and all its ancestors (upstream dependencies).
+                    - ``['*some_asset_key+++']`` select ``some_asset_key``, all its ancestors, and its descendants (downstream dependencies) within 3 levels down.
+                    - ``['*some_asset_key', 'other_asset_key_a', 'other_asset_key_b+']`` select ``some_asset_key`` and all its ancestors, ``other_asset_key_a`` itself, and ``other_asset_key_b`` and its direct child asset keys. When subselecting into a multi-asset, all of the asset keys in that multi-asset must be selected.
+
+        Returns:
+            ExecuteInProcessResult: The result of the execution.
+        """
+        return self.build_job(
+            name="in_process_materialization_job", selection=selection
+        ).execute_in_process()
 
 
 def _find_assets_in_module(
