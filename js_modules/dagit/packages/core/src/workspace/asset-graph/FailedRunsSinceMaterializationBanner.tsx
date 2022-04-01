@@ -3,7 +3,6 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 
 import {titleForRun} from '../../runs/RunUtils';
-import {runsPathWithFilters} from '../../runs/RunsFilterInput';
 
 import {LiveDataForNode, __ASSET_GROUP} from './Utils';
 
