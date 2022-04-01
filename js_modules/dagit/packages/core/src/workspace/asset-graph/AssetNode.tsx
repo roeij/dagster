@@ -64,8 +64,7 @@ export const AssetNode: React.FC<{
             <Tooltip content="A run has started that will rematerialize this asset soon.">
               <Spinner purpose="body-text" stopped />
             </Tooltip>
-          ) : liveData &&
-            (liveData.runWhichFailedToMaterialize || liveData.runsSinceMaterialization) ? (
+          ) : liveData && liveData.runWhichFailedToMaterialize ? (
             <Tooltip content="This asset was not materialized by one or more recent runs.">
               <IconWIP name="warning" color={ColorsWIP.Gray400} />
             </Tooltip>
