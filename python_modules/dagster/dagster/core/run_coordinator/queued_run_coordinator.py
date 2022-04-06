@@ -70,7 +70,8 @@ class QueuedRunCoordinator(RunCoordinator, ConfigurableClass):
             "max_concurrent_runs": Field(
                 config=IntSource,
                 is_required=False,
-                description="The maximum number of runs that are allowed to be in progress at once",
+                description="The maximum number of runs that are allowed to be in progress at once. "
+                "Defaults to 10. Set to -1 to disable the limit.",
             ),
             "tag_concurrency_limits": Field(
                 config=Noneable(
